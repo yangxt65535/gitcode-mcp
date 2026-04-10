@@ -1,0 +1,62 @@
+# Node/npm
+node_modules/
+dist/
+build/
+.npm/
+.npmrc
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+.DS_Store
+Thumbs.db
+
+# OS
+ehthumbs.db
+Icon?
+._*
+
+# Test coverage & build artifacts
+coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# Mac system
+.DS_Store
+
+# AI tools and mainstream config
+# OpenAI, Claude, Llama, HuggingFace, and Cursor
+.openai/
+.claude/
+.llama/
+.huggingface/
+.cursor/
+
+# Miscellaneous
+tmp/
+temp/
+.cache/
+*.tmp
+*.temp
+
+# Custom
+/.local/
