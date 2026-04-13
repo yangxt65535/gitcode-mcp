@@ -1,0 +1,9 @@
+src/
+test/
+.claude/
+.git/
+node_modules/
+*.sh
+tsconfig.json
+.env.example
+package-lock.json

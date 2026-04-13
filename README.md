@@ -27,6 +27,23 @@
 
 ## 安装
 
+### 通过 npm（推荐）
+
+npm 发布后可直接使用，无需 clone 和本地构建：
+
+```bash
+claude mcp add gitcode -- npx @yangxt65535/gitcode-mcp -e GITCODE_TOKEN=your_token
+```
+
+若 MCP 名称冲突，可先移除再添加：
+
+```bash
+claude mcp remove -s user gitcode
+claude mcp add gitcode -- npx @yangxt65535/gitcode-mcp -e GITCODE_TOKEN=your_token
+```
+
+### 本地开发安装
+
 若已安装 **Node.js**、**Claude Code**，可在仓库根目录执行：
 
 ```bash
