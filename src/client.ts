@@ -4,7 +4,7 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import {
+import type {
   GitcodeIssue,
   GitcodePullRequest,
   GitcodePRBranch,
