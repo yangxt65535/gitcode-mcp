@@ -32,14 +32,14 @@
 npm 发布后可直接使用，无需 clone 和本地构建：
 
 ```bash
-claude mcp add gitcode -- npx @yangxt65535/gitcode-mcp -e GITCODE_TOKEN=your_token
+claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
 ```
 
 若 MCP 名称冲突，可先移除再添加：
 
 ```bash
 claude mcp remove -s user gitcode
-claude mcp add gitcode -- npx @yangxt65535/gitcode-mcp -e GITCODE_TOKEN=your_token
+claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
 ```
 
 ### 本地开发安装
