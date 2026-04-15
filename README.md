@@ -29,39 +29,15 @@
 
 ### 通过 npm（推荐）
 
-npm 发布后可直接使用，无需 clone 和本地构建：
+项目已发布到 npm，可直接使用，无需 clone 和本地构建：
 
 ```bash
 claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
 ```
 
-若 MCP 名称冲突，可先移除再添加：
+> gitcode token 参阅 [API 认证](#api-认证)
 
-```bash
-claude mcp remove -s user gitcode
-claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
-```
-
-### 本地开发安装
-
-若已安装 **Node.js**、**Claude Code**，可在仓库根目录执行：
-
-```bash
-chmod +x install_claude.sh
-./install_claude.sh
-```
-
-脚本会依次：
-- npm 依赖安装与构建
-- 提示输入 `GITCODE_TOKEN`
-- 执行 **`claude mcp add -s user …`** 注册为 MCP 服务 `gitcode`
-- 复制 `skills/gitcode-issue-fixer/SKILL.md` 到 Claude Code Skill 文件夹，
-
-若 MCP 名称冲突，可先移除再重跑脚本：
-
-```bash
-claude mcp remove -s user gitcode
-```
+复制 `skills/gitcode-issue-fixer/SKILL.md` 到 Agent 的 Skill 目录，具体添加方式参考各 AI 工具文档。
 
 ## 配置
 
@@ -79,7 +55,7 @@ Gitcode API 使用 `access_token` 作为 Query 参数进行认证：
 GET /repos/:owner/:repo/issues/:number?access_token=YOUR_TOKEN
 ```
 
-前往 **个人设置** - **访问令牌** 中创建，需要保证必备的权限
+前往 **个人设置** - **访问令牌** 中创建，确保 token 有必备的权限
 
 ## 注意事项
 
