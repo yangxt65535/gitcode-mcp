@@ -105,14 +105,22 @@ git rebase upstream/<base_branch>
 
 1. **静态检查**：用 ReadLints 检查修改文件是否引入 lint 错误
 2. **构建验证**：运行项目构建命令（如 `npm run build`、`cargo build` 等），确保编译通过
-3. **测试验证**：运行项目测试命令（如 `npm test`、`pytest` 等），确保已有测试不被破坏。对于新增或修改模块，应当补充适量的单元测试与集成测试，同样保证测试能够通过。
+3. **测试验证**：运行项目测试命令（如 `npm test`、`pytest` 等），确保已有测试不被破坏
 4. **问题复查**：回顾 Issue 描述，确认修复逻辑覆盖了问题场景
 
 如果验证失败，分析原因并修正，重复此阶段直到通过。
 
 ### 阶段 6：提交与创建 PR
 
-验证通过后，**询问用户**是否需要创建 commit 和 PR。
+验证通过后，**不得**直接创建 commit 和 PR，应当先拟定 commit 消息，再**询问用户**是否需要创建 commit 和 PR。
+
+commit 消息规范：
+- 符合 Conventional Commits 格式，<type>(<scope>): <short description>。示例：
+  - fix(auth): resolve login issue with new users
+  - feat(user-profile): add profile picture upload functionality
+  - refactor(api): optimize data fetching logic
+- commit 应当精简，最多3句话，禁止换行、分段等
+- 使用英语编写 commit 消息
 
 如果用户确认：
 
@@ -201,7 +209,7 @@ CallMcpTool: gitcode-mcp / gitcode_create_pull_request
 
 > `fork_path` 是跨仓 PR 的关键参数，值为个人 fork 的 `owner/repo` 路径。跨仓 Issue 时省略 `issue` 字段。
 
-PR body 模板：
+PR body 模板，使用中文编写：
 
 ```markdown
 ## 问题

@@ -11,33 +11,62 @@
 
 ## 功能
 
-### gitcode-issue-fixer SKILL
+### SKILL
 
-`gitcode-issue-fixer` 是一个 Claude Code Agent Skill，基于本项目的 MCP 能力，支持自动化处理 Gitcode 平台的 Issue 和 Pull Request 相关任务。适用于通过 Claude Code、Cursor 等 AI 工具一键修复和管理项目问题，提高研发协作效率。
+- `gitcode-issue-fixer` 是一个 Claude Code Agent Skill，基于本项目的 MCP 能力，支持自动化处理 Gitcode 平台的 Issue 和 Pull Request 相关任务。适用于通过 Claude Code、Cursor 等 AI 工具一键修复和管理项目问题，提高研发协作效率。
 
-### Issue 工具
+### MCP 工具
 - `gitcode_list_issues` - 列出仓库的 Issues
 - `gitcode_get_issue` - 获取单个 Issue 详情
 - `gitcode_create_issue` - 创建新 Issue
-
-### Pull Request 工具
 - `gitcode_list_pull_requests` - 列出仓库的 Pull Requests
 - `gitcode_get_pull_request` - 获取单个 Pull Request 详情
 - `gitcode_create_pull_request` - 创建新 Pull Request
 
 ## 安装
 
-### 通过 npm（推荐）
+### 环境变量
 
-项目已发布到 npm，可直接使用，无需 clone 和本地构建：
+| 变量 | 必需 | 说明 |
+|------|------|------|
+| `GITCODE_TOKEN` | 是 | Gitcode API access_token |
+| `GITCODE_API_URL` | 否 | API 基础 URL，默认为 `https://api.gitcode.com/api/v5` |
+
+
+Gitcode API 使用 `access_token` 作为 Query 参数进行认证：
+```
+GET /repos/:owner/:repo/issues/:number?access_token=YOUR_TOKEN
+```
+
+前往 **个人设置** - **访问令牌** 中创建，确保 token 有必备的权限
+
+### 添加 MCP
+
+项目已发布到 npm，可直接 npx 使用，无需 clone 和本地构建。具体添加方式参阅各 AI 工具文档。
+
 
 ```bash
+# claude code
 claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
 ```
 
-> gitcode token 参阅 [API 认证](#api-认证)
+```json
+"gitcode-mcp": {
+    "type": "stdio",
+    "command": "npx",
+    "args": [
+        "@yangxt65535/gitcode-mcp"
+    ],
+    "env": {
+        "GITCODE_TOKEN": "your_token"
+    }
+}
 
-复制 `skills/gitcode-issue-fixer/SKILL.md` 到 Agent 的 Skill 目录，具体添加方式参考各 AI 工具文档。
+```
+
+### 添加 Skill
+
+复制 `skills/gitcode-issue-fixer/` 目录到 Agent 的 Skill 目录，具体添加方式参考各 AI 工具文档。
 
 ## 配置
 
