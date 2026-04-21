@@ -221,4 +221,45 @@ export function registerPullRequestTools(server: McpServer, client: GitcodeClien
       }
     }
   );
+
+  // Create Pull Request Comment
+  server.tool(
+    'gitcode_create_pull_request_comment',
+    '在Pull Request中添加评论',
+    {
+      owner: z.string().describe('仓库所属空间地址(组织或个人的地址path)'),
+      repo: z.string().describe('仓库路径(path)'),
+      pull_number: z.number().describe('PR序号'),
+      body: z.string().describe('评论内容'),
+      path: z.string().optional().describe('文件的相对路径（代码行评论时必填）'),
+      position: z.number().optional().describe('代码所在行数（代码行评论时必填）'),
+    },
+    async (params) => {
+      try {
+        const comment = await client.createPullRequestComment({
+          owner: params.owner,
+          repo: params.repo,
+          pull_number: params.pull_number,
+          body: params.body,
+          path: params.path,
+          position: params.position,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `评论添加成功:\nID: ${comment.id}\nContent: ${comment.body}`,
+            },
+          ],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return {
+          content: [{ type: 'text' as const, text: `Error adding comment: ${message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
 }

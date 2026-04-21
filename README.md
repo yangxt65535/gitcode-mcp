@@ -13,7 +13,8 @@
 
 ### SKILL
 
-- `gitcode-issue-fixer` 是一个 Claude Code Agent Skill，基于本项目的 MCP 能力，支持自动化处理 Gitcode 平台的 Issue 和 Pull Request 相关任务。适用于通过 Claude Code、Cursor 等 AI 工具一键修复和管理项目问题，提高研发协作效率。
+- `gitcode-issue-fixer` 支持自动化处理 Gitcode 平台的 Issue 和 Pull Request 相关任务。端到端完成小规模 Issue 的修复与关联 PR 提交。
+- `gitcode-pr-review` 自动化完成 Gitcode PR 读取、代码变更分析，并发表评审评论。
 
 ### MCP 工具
 - `gitcode_list_issues` - 列出仓库的 Issues
@@ -22,6 +23,7 @@
 - `gitcode_list_pull_requests` - 列出仓库的 Pull Requests
 - `gitcode_get_pull_request` - 获取单个 Pull Request 详情
 - `gitcode_create_pull_request` - 创建新 Pull Request
+- `gitcode_create_pull_request_comment` - 在 Pull Request 中添加评论
 
 ## 安装
 

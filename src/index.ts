@@ -66,6 +66,7 @@ server.resource(
             'gitcode_list_pull_requests',
             'gitcode_get_pull_request',
             'gitcode_create_pull_request',
+            'gitcode_create_pull_request_comment',
           ],
           resources: [
             { name: 'gitcode-server-info', uri: 'gitcode://server/info' },

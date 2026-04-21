@@ -235,4 +235,28 @@ export class GitcodeClient {
     );
     return this.normalizePullRequestResponse(response.data);
   }
+
+  /**
+   * Create a comment on a pull request
+   * API: POST /repos/:owner/:repo/pulls/:number/comments
+   */
+  async createPullRequestComment(params: {
+    owner: string;
+    repo: string;
+    pull_number: number;
+    body: string;
+    path?: string;
+    position?: number;
+  }): Promise<{ id: string; body: string }> {
+    const requestBody: Record<string, unknown> = { body: params.body };
+    if (params.path) requestBody.path = params.path;
+    if (params.position) requestBody.position = params.position;
+
+    const response = await this.client.post(
+      `/repos/${params.owner}/${params.repo}/pulls/${params.pull_number}/comments`,
+      requestBody,
+      { params: this.withToken() }
+    );
+    return response.data;
+  }
 }
