@@ -1,6 +1,6 @@
 {
   "name": "@yangxt65535/gitcode-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MCP server for Gitcode platform - Issue and Pull Request operations",
   "main": "dist/index.js",
   "type": "module",
@@ -9,8 +9,7 @@
   },
   "files": [
     "dist",
-    "README.md",
-    "skills"
+    "README.md"
   ],
   "scripts": {
     "clean": "rimraf dist",

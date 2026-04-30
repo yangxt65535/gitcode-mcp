@@ -242,5 +242,109 @@ export interface CreatePullRequestParams {
   head: string;
   base: string;
   body?: string;
+  milestone_number?: number;
+  labels?: string;
+  issue?: string;
+  assignees?: string;
+  testers?: string;
+  prune_source_branch?: boolean;
   draft?: boolean;
+  squash?: boolean;
+  squash_commit_message?: string;
+  fork_path?: string;
+  close_related_issue?: boolean;
+}
+
+// Issue 评论
+export interface CreateIssueCommentParams {
+  owner: string;
+  repo: string;
+  issue_number: string;
+  body: string;
+}
+
+export interface CreateIssueCommentResult {
+  id: number;
+  body: string;
+}
+
+export interface ListIssueCommentsParams {
+  owner: string;
+  repo: string;
+  issue_number: string;
+  page?: number;
+  per_page?: number;
+  order?: string;
+  since?: string;
+}
+
+export interface GitcodeIssueCommentTarget {
+  issue: {
+    id: number;
+    title: string;
+    number: number;
+  };
+}
+
+export interface GitcodeIssueComment {
+  id: number;
+  body: string;
+  user: GitcodeUser;
+  created_at: string;
+  updated_at: string;
+  target?: GitcodeIssueCommentTarget;
+}
+
+// Pull Request 评论
+export interface CreatePullRequestCommentParams {
+  owner: string;
+  repo: string;
+  pull_number: number;
+  body: string;
+  path?: string;
+  position?: number;
+}
+
+export interface CreatePullRequestCommentResult {
+  id: string;
+  body: string;
+}
+
+export interface ListPullRequestCommentsParams {
+  owner: string;
+  repo: string;
+  pull_number: number;
+  page?: number;
+  per_page?: number;
+  direction?: string;
+  comment_type?: string;
+}
+
+export interface GitcodeDiffPosition {
+  start_new_line: number;
+  end_new_line: number;
+  start_old_line: number;
+  end_old_line: number;
+}
+
+export interface GitcodePullRequestCommentReply {
+  id: number;
+  body: string;
+  created_at: string;
+  updated_at: string;
+  user: GitcodeUser;
+}
+
+export interface GitcodePullRequestComment {
+  id: number;
+  discussion_id: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+  user: GitcodeUser;
+  comment_type: string;
+  resolved: boolean;
+  diff_file: string;
+  diff_position: GitcodeDiffPosition;
+  reply: GitcodePullRequestCommentReply[];
 }

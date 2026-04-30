@@ -11,7 +11,6 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { config } from 'dotenv';
 import { GitcodeClient } from './client.js';
-import { registerGitcodeIssueFixerSkillResource } from './skillResource.js';
 import { registerIssueTools } from './tools/issues.js';
 import { registerPullRequestTools } from './tools/pullRequests.js';
 
@@ -43,13 +42,14 @@ const server = new McpServer({
 registerIssueTools(server, gitcodeClient);
 registerPullRequestTools(server, gitcodeClient);
 
-// Bundled Agent Skill (GitCode 问题单修复专家)
-registerGitcodeIssueFixerSkillResource(server);
-
 // Add server info resource
-server.resource(
+server.registerResource(
   'gitcode-server-info',
   'gitcode://server/info',
+  {
+    description: 'Gitcode MCP metadata: tool names and API base URL',
+    mimeType: 'application/json',
+  },
   async () => ({
     contents: [
       {
@@ -63,14 +63,16 @@ server.resource(
             'gitcode_list_issues',
             'gitcode_get_issue',
             'gitcode_create_issue',
+            'gitcode_create_issue_comment',
+            'gitcode_list_issue_comments',
             'gitcode_list_pull_requests',
             'gitcode_get_pull_request',
             'gitcode_create_pull_request',
             'gitcode_create_pull_request_comment',
+            'gitcode_list_pull_request_comments',
           ],
           resources: [
             { name: 'gitcode-server-info', uri: 'gitcode://server/info' },
-            { name: 'gitcode-issue-fixer-skill', uri: 'gitcode://skill/gitcode-issue-fixer' },
           ],
           apiBaseUrl: gitcodeClient['baseUrl'],
         }, null, 2),

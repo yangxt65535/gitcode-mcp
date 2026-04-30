@@ -11,6 +11,18 @@ import type {
   GitcodeUser,
   GetIssueParams,
   GetPullRequestParams,
+  ListIssuesParams,
+  CreateIssueParams,
+  CreateIssueCommentParams,
+  CreateIssueCommentResult,
+  ListIssueCommentsParams,
+  GitcodeIssueComment,
+  ListPullRequestsParams,
+  CreatePullRequestParams,
+  CreatePullRequestCommentParams,
+  CreatePullRequestCommentResult,
+  ListPullRequestCommentsParams,
+  GitcodePullRequestComment,
 } from './types.js';
 
 export class GitcodeClient {
@@ -136,25 +148,59 @@ export class GitcodeClient {
 
   /**
    * List repository issues
-   * Placeholder - API endpoint to be confirmed
+   * API: GET /repos/:owner/:repo/issues
    */
-  async listIssues(params: { owner: string; repo: string; state?: string; page?: number; per_page?: number }): Promise<GitcodeIssue[]> {
+  async listIssues(params: ListIssuesParams): Promise<GitcodeIssue[]> {
     const response = await this.client.get(
       `/repos/${params.owner}/${params.repo}/issues`,
-      { params: this.withToken({ state: params.state, page: params.page, per_page: params.per_page }) }
+      {
+        params: this.withToken({
+          state: params.state,
+          page: params.page,
+          per_page: params.per_page,
+          labels: params.labels,
+          sort: params.sort,
+          direction: params.direction,
+        }),
+      }
     );
     return response.data;
   }
 
   /**
    * Create a new issue
-   * Placeholder - API endpoint to be confirmed
+   * API: POST /repos/:owner/:repo/issues
    */
-  async createIssue(params: { owner: string; repo: string; title: string; body?: string }): Promise<GitcodeIssue> {
+  async createIssue(params: CreateIssueParams): Promise<GitcodeIssue> {
     const response = await this.client.post(
       `/repos/${params.owner}/${params.repo}/issues`,
       { title: params.title, body: params.body },
       { params: this.withToken() }
+    );
+    return response.data;
+  }
+
+  /**
+   * Create a comment on an issue
+   * API: POST /repos/:owner/:repo/issues/:number/comments
+   */
+  async createIssueComment(params: CreateIssueCommentParams): Promise<CreateIssueCommentResult> {
+    const response = await this.client.post(
+      `/repos/${params.owner}/${params.repo}/issues/${params.issue_number}/comments`,
+      { body: params.body },
+      { params: this.withToken() }
+    );
+    return response.data;
+  }
+
+  /**
+   * List comments on an issue
+   * API: GET /repos/:owner/:repo/issues/:number/comments
+   */
+  async listIssueComments(params: ListIssueCommentsParams): Promise<GitcodeIssueComment[]> {
+    const response = await this.client.get(
+      `/repos/${params.owner}/${params.repo}/issues/${params.issue_number}/comments`,
+      { params: this.withToken({ page: params.page, per_page: params.per_page, order: params.order, since: params.since }) }
     );
     return response.data;
   }
@@ -175,12 +221,22 @@ export class GitcodeClient {
 
   /**
    * List repository pull requests
-   * Placeholder - API endpoint to be confirmed
+   * API: GET /repos/:owner/:repo/pulls
    */
-  async listPullRequests(params: { owner: string; repo: string; state?: string; page?: number; per_page?: number }): Promise<GitcodePullRequest[]> {
+  async listPullRequests(params: ListPullRequestsParams): Promise<GitcodePullRequest[]> {
     const response = await this.client.get(
       `/repos/${params.owner}/${params.repo}/pulls`,
-      { params: this.withToken({ state: params.state, page: params.page, per_page: params.per_page }) }
+      {
+        params: this.withToken({
+          state: params.state,
+          page: params.page,
+          per_page: params.per_page,
+          head: params.head,
+          base: params.base,
+          sort: params.sort,
+          direction: params.direction,
+        }),
+      }
     );
     return response.data;
   }
@@ -189,25 +245,7 @@ export class GitcodeClient {
    * Create a new pull request
    * API: POST /repos/:owner/:repo/pulls
    */
-  async createPullRequest(params: {
-    owner: string;
-    repo: string;
-    title: string;
-    head: string;
-    base: string;
-    body?: string;
-    milestone_number?: number;
-    labels?: string;
-    issue?: string;
-    assignees?: string;
-    testers?: string;
-    prune_source_branch?: boolean;
-    draft?: boolean;
-    squash?: boolean;
-    squash_commit_message?: string;
-    fork_path?: string;
-    close_related_issue?: boolean;
-  }): Promise<GitcodePullRequest> {
+  async createPullRequest(params: CreatePullRequestParams): Promise<GitcodePullRequest> {
     const body: Record<string, unknown> = {
       title: params.title,
       head: params.head,
@@ -240,14 +278,7 @@ export class GitcodeClient {
    * Create a comment on a pull request
    * API: POST /repos/:owner/:repo/pulls/:number/comments
    */
-  async createPullRequestComment(params: {
-    owner: string;
-    repo: string;
-    pull_number: number;
-    body: string;
-    path?: string;
-    position?: number;
-  }): Promise<{ id: string; body: string }> {
+  async createPullRequestComment(params: CreatePullRequestCommentParams): Promise<CreatePullRequestCommentResult> {
     const requestBody: Record<string, unknown> = { body: params.body };
     if (params.path) requestBody.path = params.path;
     if (params.position) requestBody.position = params.position;
@@ -256,6 +287,18 @@ export class GitcodeClient {
       `/repos/${params.owner}/${params.repo}/pulls/${params.pull_number}/comments`,
       requestBody,
       { params: this.withToken() }
+    );
+    return response.data;
+  }
+
+  /**
+   * List comments on a pull request
+   * API: GET /repos/:owner/:repo/pulls/:number/comments
+   */
+  async listPullRequestComments(params: ListPullRequestCommentsParams): Promise<GitcodePullRequestComment[]> {
+    const response = await this.client.get(
+      `/repos/${params.owner}/${params.repo}/pulls/${params.pull_number}/comments`,
+      { params: this.withToken({ page: params.page, per_page: params.per_page, direction: params.direction, comment_type: params.comment_type }) }
     );
     return response.data;
   }

@@ -8,13 +8,15 @@ import { GitcodeClient } from '../client.js';
 
 export function registerIssueTools(server: McpServer, client: GitcodeClient) {
   // Get Issue - Based on actual Gitcode API
-  server.tool(
+  server.registerTool(
     'gitcode_get_issue',
-    'Get details of a specific issue from Gitcode repository',
     {
-      owner: z.string().describe('仓库所属空间地址(组织或个人的地址path)'),
-      repo: z.string().describe('仓库路径(path)'),
-      issue_number: z.string().describe('Issue编号(区分大小写，无需添加 # 号)'),
+      description: '获取 Gitcode 仓库中指定 Issue 的详情',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址(组织或个人的地址path)'),
+        repo: z.string().describe('仓库路径(path)'),
+        issue_number: z.string().describe('Issue编号(区分大小写，无需添加 # 号)'),
+      },
     },
     async (params) => {
       try {
@@ -66,15 +68,17 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
   );
 
   // List Issues
-  server.tool(
+  server.registerTool(
     'gitcode_list_issues',
-    'List repository issues from Gitcode',
     {
-      owner: z.string().describe('仓库所属空间地址'),
-      repo: z.string().describe('仓库路径'),
-      state: z.string().optional().describe('Issue状态筛选'),
-      page: z.number().optional().describe('页码'),
-      per_page: z.number().optional().describe('每页数量'),
+      description: '列出 Gitcode 仓库中的 Issue',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址'),
+        repo: z.string().describe('仓库路径'),
+        state: z.string().optional().describe('Issue状态筛选'),
+        page: z.number().optional().describe('页码'),
+        per_page: z.number().optional().describe('每页数量'),
+      },
     },
     async (params) => {
       try {
@@ -119,14 +123,16 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
   );
 
   // Create Issue
-  server.tool(
+  server.registerTool(
     'gitcode_create_issue',
-    'Create a new issue in a Gitcode repository',
     {
-      owner: z.string().describe('仓库所属空间地址'),
-      repo: z.string().describe('仓库路径'),
-      title: z.string().describe('Issue标题'),
-      body: z.string().optional().describe('Issue内容描述'),
+      description: '在 Gitcode 仓库中创建新的 Issue',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址'),
+        repo: z.string().describe('仓库路径'),
+        title: z.string().describe('Issue标题'),
+        body: z.string().optional().describe('Issue内容描述'),
+      },
     },
     async (params) => {
       try {
@@ -158,6 +164,102 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         return {
           content: [{ type: 'text' as const, text: `Error creating issue: ${message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Create Issue Comment
+  server.registerTool(
+    'gitcode_create_issue_comment',
+    {
+      description: '在 Issue 中添加评论',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址(组织或个人的地址path)'),
+        repo: z.string().describe('仓库路径(path)'),
+        issue_number: z.string().describe('Issue编号(区分大小写，无需添加 # 号)'),
+        body: z.string().describe('评论内容'),
+      },
+    },
+    async (params) => {
+      try {
+        const comment = await client.createIssueComment({
+          owner: params.owner,
+          repo: params.repo,
+          issue_number: params.issue_number,
+          body: params.body,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `评论添加成功:\n${JSON.stringify(comment, null, 2)}`,
+            },
+          ],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return {
+          content: [{ type: 'text' as const, text: `Error creating issue comment: ${message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // List Issue Comments
+  server.registerTool(
+    'gitcode_list_issue_comments',
+    {
+      description: '获取仓库中指定 Issue 的全部评论',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址(企业、组织或个人的地址path)'),
+        repo: z.string().describe('仓库路径(path)'),
+        issue_number: z.string().describe('Issue 编号(区分大小写，无需添加 # 号)'),
+        page: z.number().optional().describe('当前的页码'),
+        per_page: z.number().optional().describe('每页的数量，最大为 100，默认 20'),
+        order: z.string().optional().describe('排序顺序: asc, desc (默认 asc)'),
+        since: z.string().optional().describe('起始的更新时间，格式: 2024-11-10T08:10:30.000+08:00'),
+      },
+    },
+    async (params) => {
+      try {
+        const comments = await client.listIssueComments({
+          owner: params.owner,
+          repo: params.repo,
+          issue_number: params.issue_number,
+          page: params.page,
+          per_page: params.per_page,
+          order: params.order,
+          since: params.since,
+        });
+
+        const commentList = comments.map(c => ({
+          id: c.id,
+          body: c.body,
+          user: {
+            login: c.user.login,
+            name: c.user.name,
+          },
+          target: c.target,
+          created_at: c.created_at,
+          updated_at: c.updated_at,
+        }));
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify(commentList, null, 2),
+            },
+          ],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return {
+          content: [{ type: 'text' as const, text: `Error listing issue comments: ${message}` }],
           isError: true,
         };
       }

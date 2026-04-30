@@ -9,21 +9,17 @@
 
 基于 Node.js 的 MCP (Model Context Protocol) 服务器，用于 Gitcode 平台的 Issue 和 Pull Request 操作。
 
-## 功能
-
-### SKILL
-
-- `gitcode-issue-fixer` 支持自动化处理 Gitcode 平台的 Issue 和 Pull Request 相关任务。端到端完成小规模 Issue 的修复与关联 PR 提交。
-- `gitcode-pr-review` 自动化完成 Gitcode PR 读取、代码变更分析，并发表评审评论。
-
-### MCP 工具
+## 工具列表
 - `gitcode_list_issues` - 列出仓库的 Issues
 - `gitcode_get_issue` - 获取单个 Issue 详情
 - `gitcode_create_issue` - 创建新 Issue
+- `gitcode_create_issue_comment` - 在 Issue 中添加评论
+- `gitcode_list_issue_comments` - 获取 Issue 的所有评论
 - `gitcode_list_pull_requests` - 列出仓库的 Pull Requests
 - `gitcode_get_pull_request` - 获取单个 Pull Request 详情
 - `gitcode_create_pull_request` - 创建新 Pull Request
 - `gitcode_create_pull_request_comment` - 在 Pull Request 中添加评论
+- `gitcode_list_pull_request_comments` - 获取 Pull Request 的所有评论
 
 ## 安装
 
@@ -49,7 +45,7 @@ GET /repos/:owner/:repo/issues/:number?access_token=YOUR_TOKEN
 
 ```bash
 # claude code
-claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
+claude mcp add gitcode-mcp --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcode-mcp
 ```
 
 ```json
@@ -65,10 +61,6 @@ claude mcp add gitcode --env GITCODE_TOKEN=your_token -- npx @yangxt65535/gitcod
 }
 
 ```
-
-### 添加 Skill
-
-复制 `skills/gitcode-issue-fixer/` 目录到 Agent 的 Skill 目录，具体添加方式参考各 AI 工具文档。
 
 ## 配置
 
