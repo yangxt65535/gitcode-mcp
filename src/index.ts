@@ -34,7 +34,7 @@ const gitcodeClient = new GitcodeClient(GITCODE_TOKEN, GITCODE_API_URL);
 // Initialize MCP server
 const server = new McpServer({
   name: 'gitcode-mcp',
-  version: '1.0.0',
+  version: '1.3.0',
   description: 'MCP server for Gitcode platform - Issue and Pull Request operations',
 });
 
@@ -57,17 +57,19 @@ server.registerResource(
         mimeType: 'application/json',
         text: JSON.stringify({
           name: 'gitcode-mcp',
-          version: '1.0.0',
+          version: '1.3.0',
           description: 'MCP server for Gitcode platform operations',
           tools: [
             'gitcode_list_issues',
             'gitcode_get_issue',
             'gitcode_create_issue',
+            'gitcode_update_issue',
             'gitcode_create_issue_comment',
             'gitcode_list_issue_comments',
             'gitcode_list_pull_requests',
             'gitcode_get_pull_request',
             'gitcode_create_pull_request',
+            'gitcode_update_pull_request',
             'gitcode_create_pull_request_comment',
             'gitcode_list_pull_request_comments',
           ],

@@ -13,11 +13,13 @@
 - `gitcode_list_issues` - 列出仓库的 Issues
 - `gitcode_get_issue` - 获取单个 Issue 详情
 - `gitcode_create_issue` - 创建新 Issue
+- `gitcode_update_issue` - 更新 Issue 信息
 - `gitcode_create_issue_comment` - 在 Issue 中添加评论
 - `gitcode_list_issue_comments` - 获取 Issue 的所有评论
 - `gitcode_list_pull_requests` - 列出仓库的 Pull Requests
 - `gitcode_get_pull_request` - 获取单个 Pull Request 详情
 - `gitcode_create_pull_request` - 创建新 Pull Request
+- `gitcode_update_pull_request` - 更新 Pull Request 信息
 - `gitcode_create_pull_request_comment` - 在 Pull Request 中添加评论
 - `gitcode_list_pull_request_comments` - 获取 Pull Request 的所有评论
 

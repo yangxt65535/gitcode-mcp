@@ -170,6 +170,72 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
     }
   );
 
+  // Update Issue
+  server.registerTool(
+    'gitcode_update_issue',
+    {
+      description: '更新 Gitcode 仓库中指定 Issue 的信息',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址(组织或个人的地址path)'),
+        issue_number: z.string().describe('Issue编号(区分大小写，无需添加 # 号)'),
+        repo: z.string().describe('仓库路径'),
+        title: z.string().optional().describe('Issue标题'),
+        body: z.string().optional().describe('Issue描述'),
+        state: z.string().optional().describe('Issue状态（reopen: 开启, close: 关闭）'),
+        assignee: z.string().optional().describe('Issue负责人的username，多个用英文逗号隔开'),
+        milestone: z.number().optional().describe('里程碑序号'),
+        labels: z.string().optional().describe('用逗号分开的标签，如: bug,performance'),
+        security_hole: z.string().optional().describe('是否是私有issue'),
+        status: z.string().optional().describe('issue状态（企业版支持）'),
+        issue_severity: z.string().optional().describe('issue优先级（企业版支持）'),
+        custom_fields: z.array(z.object({})).optional().describe('自定义字段'),
+      },
+    },
+    async (params) => {
+      try {
+        const issue = await client.updateIssue({
+          owner: params.owner,
+          repo: params.repo,
+          issue_number: params.issue_number,
+          title: params.title,
+          body: params.body,
+          state: params.state,
+          assignee: params.assignee,
+          milestone: params.milestone,
+          labels: params.labels,
+          security_hole: params.security_hole,
+          status: params.status,
+          issue_severity: params.issue_severity,
+          custom_fields: params.custom_fields,
+        });
+
+        const updatedIssue = {
+          id: issue.id,
+          number: issue.number,
+          title: issue.title,
+          state: issue.state,
+          url: issue.html_url,
+          updated_at: issue.updated_at,
+        };
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Issue更新成功:\n${JSON.stringify(updatedIssue, null, 2)}`,
+            },
+          ],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return {
+          content: [{ type: 'text' as const, text: `Error updating issue: ${message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
   // Create Issue Comment
   server.registerTool(
     'gitcode_create_issue_comment',

@@ -348,3 +348,34 @@ export interface GitcodePullRequestComment {
   diff_position: GitcodeDiffPosition;
   reply: GitcodePullRequestCommentReply[];
 }
+
+// Update Issue
+export interface UpdateIssueParams {
+  owner: string;
+  repo: string;
+  issue_number: string;
+  title?: string;
+  body?: string;
+  state?: string;
+  assignee?: string;
+  milestone?: number;
+  labels?: string;
+  security_hole?: string;
+  status?: string;
+  issue_severity?: string;
+  custom_fields?: Record<string, unknown>[];
+}
+
+// Update Pull Request
+export interface UpdatePullRequestParams {
+  owner: string;
+  repo: string;
+  pull_number: number;
+  title?: string;
+  body?: string;
+  state?: string;
+  milestone_number?: number;
+  labels?: string;
+  draft?: boolean;
+  close_related_issue?: boolean;
+}

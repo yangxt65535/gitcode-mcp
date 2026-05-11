@@ -228,6 +228,69 @@ export function registerPullRequestTools(server: McpServer, client: GitcodeClien
     }
   );
 
+  // Update Pull Request
+  server.registerTool(
+    'gitcode_update_pull_request',
+    {
+      description: '更新 Gitcode 仓库中指定 Pull Request 的信息',
+      inputSchema: {
+        owner: z.string().describe('仓库所属空间地址(组织或个人的地址path)'),
+        repo: z.string().describe('仓库路径(path)'),
+        pull_number: z.number().describe('PR序号'),
+        title: z.string().optional().describe('Pull Request标题'),
+        body: z.string().optional().describe('Pull Request内容'),
+        state: z.string().optional().describe('Pull Request状态'),
+        milestone_number: z.number().optional().describe('里程碑序号(id)'),
+        labels: z.string().optional().describe('用逗号分开的标签，如: bug,performance'),
+        draft: z.boolean().optional().describe('是否设置为草稿'),
+        close_related_issue: z.boolean().optional().describe('合并后是否关闭关联的Issue'),
+      },
+    },
+    async (params) => {
+      try {
+        const pr = await client.updatePullRequest({
+          owner: params.owner,
+          repo: params.repo,
+          pull_number: params.pull_number,
+          title: params.title,
+          body: params.body,
+          state: params.state,
+          milestone_number: params.milestone_number,
+          labels: params.labels,
+          draft: params.draft,
+          close_related_issue: params.close_related_issue,
+        });
+
+        const updatedPR = {
+          id: pr.id,
+          number: pr.number,
+          title: pr.title,
+          state: pr.state,
+          draft: pr.draft,
+          head: pr.head.ref,
+          base: pr.base.ref,
+          url: pr.html_url,
+          updated_at: pr.updated_at,
+        };
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `Pull Request更新成功:\n${JSON.stringify(updatedPR, null, 2)}`,
+            },
+          ],
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return {
+          content: [{ type: 'text' as const, text: `Error updating pull request: ${message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
   // Create Pull Request Comment
   server.registerTool(
     'gitcode_create_pull_request_comment',

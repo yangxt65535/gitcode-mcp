@@ -13,12 +13,14 @@ import type {
   GetPullRequestParams,
   ListIssuesParams,
   CreateIssueParams,
+  UpdateIssueParams,
   CreateIssueCommentParams,
   CreateIssueCommentResult,
   ListIssueCommentsParams,
   GitcodeIssueComment,
   ListPullRequestsParams,
   CreatePullRequestParams,
+  UpdatePullRequestParams,
   CreatePullRequestCommentParams,
   CreatePullRequestCommentResult,
   ListPullRequestCommentsParams,
@@ -181,6 +183,33 @@ export class GitcodeClient {
   }
 
   /**
+   * Update an issue
+   * API: PATCH /repos/:owner/issues/:number
+   */
+  async updateIssue(params: UpdateIssueParams): Promise<GitcodeIssue> {
+    const body: Record<string, unknown> = {
+      repo: params.repo,
+      title: params.title,
+    };
+    if (params.body != null) body.body = params.body;
+    if (params.state) body.state = params.state;
+    if (params.assignee) body.assignee = params.assignee;
+    if (params.milestone) body.milestone = params.milestone;
+    if (params.labels) body.labels = params.labels;
+    if (params.security_hole) body.security_hole = params.security_hole;
+    if (params.status) body.status = params.status;
+    if (params.issue_severity) body.issue_severity = params.issue_severity;
+    if (params.custom_fields) body.custom_fields = params.custom_fields;
+
+    const response = await this.client.patch(
+      `/repos/${params.owner}/issues/${params.issue_number}`,
+      body,
+      { params: this.withToken() }
+    );
+    return response.data;
+  }
+
+  /**
    * Create a comment on an issue
    * API: POST /repos/:owner/:repo/issues/:number/comments
    */
@@ -268,6 +297,28 @@ export class GitcodeClient {
 
     const response = await this.client.post(
       `/repos/${params.owner}/${params.repo}/pulls`,
+      body,
+      { params: this.withToken() }
+    );
+    return this.normalizePullRequestResponse(response.data);
+  }
+
+  /**
+   * Update a pull request
+   * API: PATCH /repos/:owner/:repo/pulls/:number
+   */
+  async updatePullRequest(params: UpdatePullRequestParams): Promise<GitcodePullRequest> {
+    const body: Record<string, unknown> = {};
+    if (params.title != null) body.title = params.title;
+    if (params.body != null) body.body = params.body;
+    if (params.state) body.state = params.state;
+    if (params.milestone_number) body.milestone_number = params.milestone_number;
+    if (params.labels) body.labels = params.labels;
+    if (params.draft != null) body.draft = params.draft;
+    if (params.close_related_issue != null) body.close_related_issue = params.close_related_issue;
+
+    const response = await this.client.patch(
+      `/repos/${params.owner}/${params.repo}/pulls/${params.pull_number}`,
       body,
       { params: this.withToken() }
     );
