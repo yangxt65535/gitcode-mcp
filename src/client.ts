@@ -5,6 +5,7 @@
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type {
+  CurrentUser,
   GitcodeIssue,
   GitcodePullRequest,
   GitcodePRBranch,
@@ -132,6 +133,19 @@ export class GitcodeClient {
       head,
       base,
     } as GitcodePullRequest;
+  }
+
+  // ==================== Auth Methods ====================
+
+  /**
+   * Validate token by fetching current user info
+   * API: GET /user
+   */
+  async getUser(): Promise<CurrentUser> {
+    const response = await this.client.get('/user', {
+      params: this.withToken(),
+    });
+    return response.data;
   }
 
   // ==================== Issue Methods ====================

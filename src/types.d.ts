@@ -379,3 +379,15 @@ export interface UpdatePullRequestParams {
   draft?: boolean;
   close_related_issue?: boolean;
 }
+
+// Current user (GET /user)
+export interface CurrentUser {
+  id: string;
+  login: string;
+  name: string;
+  email?: string;
+  avatar_url?: string;
+  html_url?: string;
+  url?: string;
+  type?: string;
+}

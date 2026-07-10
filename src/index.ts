@@ -34,7 +34,7 @@ const gitcodeClient = new GitcodeClient(GITCODE_TOKEN, GITCODE_API_URL);
 // Initialize MCP server
 const server = new McpServer({
   name: 'gitcode-mcp',
-  version: '1.3.0',
+  version: '1.3.1',
   description: 'MCP server for Gitcode platform - Issue and Pull Request operations',
 });
 
@@ -57,7 +57,7 @@ server.registerResource(
         mimeType: 'application/json',
         text: JSON.stringify({
           name: 'gitcode-mcp',
-          version: '1.3.0',
+          version: '1.3.1',
           description: 'MCP server for Gitcode platform operations',
           tools: [
             'gitcode_list_issues',
@@ -85,6 +85,17 @@ server.registerResource(
 
 // Start the server
 async function main() {
+  // Validate token at startup
+  try {
+    const user = await gitcodeClient.getUser();
+    console.error(`Token valid — logged in as: ${user.login} (${user.name ?? 'N/A'})`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Error: Failed to validate GITCODE_TOKEN —', message);
+    console.error('Please check that GITCODE_TOKEN is correct and not expired.');
+    process.exit(1);
+  }
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('Gitcode MCP server started');
