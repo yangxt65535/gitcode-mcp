@@ -7,6 +7,9 @@
  * Provides tools for Issue and Pull Request management.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { config } from 'dotenv';
@@ -16,6 +19,12 @@ import { registerPullRequestTools } from './tools/pullRequests.js';
 
 // Load environment variables from .env file if exists
 config();
+
+const PACKAGE_VERSION = (
+  JSON.parse(
+    readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf8')
+  ) as { version: string }
+).version;
 
 // Validate required environment variables
 const GITCODE_TOKEN = process.env.GITCODE_TOKEN;
@@ -34,7 +43,7 @@ const gitcodeClient = new GitcodeClient(GITCODE_TOKEN, GITCODE_API_URL);
 // Initialize MCP server
 const server = new McpServer({
   name: 'gitcode-mcp',
-  version: '1.3.1',
+  version: PACKAGE_VERSION,
   description: 'MCP server for Gitcode platform - Issue and Pull Request operations',
 });
 
@@ -57,7 +66,7 @@ server.registerResource(
         mimeType: 'application/json',
         text: JSON.stringify({
           name: 'gitcode-mcp',
-          version: '1.3.1',
+          version: PACKAGE_VERSION,
           description: 'MCP server for Gitcode platform operations',
           tools: [
             'gitcode_list_issues',
