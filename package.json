@@ -23,6 +23,18 @@
   "keywords": ["mcp", "gitcode", "git", "issue", "pull-request"],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangxt65535/gitcode-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yangxt65535/gitcode-mcp/issues"
+  },
+  "homepage": "https://github.com/yangxt65535/gitcode-mcp#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "axios": "^1.7.0",

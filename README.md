@@ -9,6 +9,8 @@
 
 基于 Node.js 的 MCP (Model Context Protocol) 服务器，用于 Gitcode 平台的 Issue 和 Pull Request 操作。
 
+仓库：[https://github.com/yangxt65535/gitcode-mcp](https://github.com/yangxt65535/gitcode-mcp)
+
 ## 工具列表
 - `gitcode_list_issues` - 列出仓库的 Issues
 - `gitcode_get_issue` - 获取单个 Issue 详情
@@ -81,6 +83,23 @@ GET /repos/:owner/:repo/issues/:number?access_token=YOUR_TOKEN
 ```
 
 前往 **个人设置** - **访问令牌** 中创建，确保 token 有必备的权限
+
+## 发布
+
+本包默认公开发布到 npm（`@yangxt65535/gitcode-mcp`）。推送符合 `v*` 的 git tag 后，GitHub Actions 会通过 npm Trusted Publishing（OIDC）自动执行 `npm publish`。
+
+本地发版示例：
+
+```bash
+npm version patch   # 或 minor / major
+git push origin master --follow-tags
+```
+
+首次启用前，请在 [npmjs](https://www.npmjs.com/) 包设置中添加 Trusted Publisher：
+
+- Publisher: GitHub Actions
+- Repository: `yangxt65535/gitcode-mcp`
+- Workflow: `publish.yml`
 
 ## 注意事项
 

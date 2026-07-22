@@ -4,7 +4,6 @@ dist/
 build/
 .npm/
 .npmrc
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
