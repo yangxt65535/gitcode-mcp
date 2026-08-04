@@ -16,6 +16,7 @@ import { config } from 'dotenv';
 import { GitcodeClient } from './client.js';
 import { registerIssueTools } from './tools/issues.js';
 import { registerPullRequestTools } from './tools/pullRequests.js';
+import { registerUserTools } from './tools/user.js';
 
 // Load environment variables from .env file if exists
 config();
@@ -50,6 +51,7 @@ const server = new McpServer({
 // Register all tools
 registerIssueTools(server, gitcodeClient);
 registerPullRequestTools(server, gitcodeClient);
+registerUserTools(server, gitcodeClient);
 
 // Add server info resource
 server.registerResource(
@@ -81,6 +83,7 @@ server.registerResource(
             'gitcode_update_pull_request',
             'gitcode_create_pull_request_comment',
             'gitcode_list_pull_request_comments',
+            'gitcode_get_current_user',
           ],
           resources: [
             { name: 'gitcode-server-info', uri: 'gitcode://server/info' },
