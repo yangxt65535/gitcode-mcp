@@ -48,8 +48,10 @@ src/
 ├── client.ts             ← API 客户端层：封装 Gitcode REST API 调用
 ├── types.d.ts            ← 类型定义层：接口、参数、响应类型
 └── tools/
-    ├── issues.ts         ← Issue 相关 Tool 注册
-    └── pullRequests.ts   ← Pull Request 相关 Tool 注册
+    ├── issues.ts         ← Issue 相关 Tool 注册（含 update_issue 类型/优先级白名单校验）
+    ├── pullRequests.ts   ← Pull Request 相关 Tool 注册
+    ├── issueAttributes.ts← Issue 属性增强 Tool 注册（里程碑/看板）
+    └── user.ts           ← 用户相关 Tool 注册
 ```
 
 **分层职责：**
@@ -58,8 +60,8 @@ src/
 |---|---|---|
 | 入口/编排 | `index.ts` | 加载环境变量、初始化 client、创建 MCP Server、注册所有 Tool、启动 stdio transport |
 | API 客户端 | `client.ts` | 封装 axios 实例、Token 鉴权注入、错误拦截、API 响应归一化 |
-| 类型定义 | `types.d.ts` | 定义 API 响应实体（Issue/PR/Comment 等）和请求参数的类型 |
-| Tool 注册 | `tools/*.ts` | 为每个 MCP Tool 定义 Zod schema、实现 handler 逻辑、格式化输出 |
+| 类型定义 | `types.d.ts` | 定义 API 响应实体（Issue/PR/Comment/里程碑/看板等）和请求参数的类型 |
+| Tool 注册 | `tools/*.ts` | 为每个 MCP Tool 定义 Zod schema、实现 handler 逻辑、格式化（精简）输出 |
 
 ---
 
@@ -112,33 +114,47 @@ src/
 
 ---
 
-## 5. 工具规划（v1）
+## 5. 工具规划（当前）
 
 ### 5.1 Issue 工具
 
 | 工具名 | 功能 | API 端点 |
 |---|---|---|
-| `gitcode_list_issues` | 列出仓库 Issue，支持 state/page/per_page 筛选 | `GET /repos/:owner/:repo/issues` |
-| `gitcode_get_issue` | 获取单个 Issue 详情 | `GET /repos/:owner/:repo/issues/:number` |
+| `gitcode_list_issues` | 列出仓库 Issue，支持 state/page/per_page 筛选（精简输出） | `GET /repos/:owner/:repo/issues` |
+| `gitcode_get_issue` | 获取单个 Issue 详情（精简输出） | `GET /repos/:owner/:repo/issues/:number` |
 | `gitcode_create_issue` | 创建新 Issue | `POST /repos/:owner/:repo/issues` |
+| `gitcode_update_issue` | 更新 Issue 信息（含类型/优先级白名单与互斥校验） | `PATCH /repos/:owner/:repo/issues/:number` |
 | `gitcode_create_issue_comment` | 在 Issue 下添加评论 | `POST /repos/:owner/:repo/issues/:number/comments` |
-| `gitcode_list_issue_comments` | 获取 Issue 的全部评论（预留 v1.1） | `GET /repos/:owner/:repo/issues/:number/comments` |
-
-> **可扩展性预留：** `list_issue_comments` 在 v1 阶段实现为可选工具；后续可按相同模式添加 Issue 更新、关闭、标签管理等操作。
+| `gitcode_list_issue_comments` | 获取 Issue 的全部评论（精简输出） | `GET /repos/:owner/:repo/issues/:number/comments` |
 
 ### 5.2 Pull Request 工具
 
 | 工具名 | 功能 | API 端点 |
 |---|---|---|
-| `gitcode_list_pull_requests` | 列出仓库 PR，支持 state/sort/page 筛选 | `GET /repos/:owner/:repo/pulls` |
-| `gitcode_get_pull_request` | 获取单个 PR 详情（含 head/base、审查人、测试人、合并状态） | `GET /repos/:owner/:repo/pulls/:number` |
+| `gitcode_list_pull_requests` | 列出仓库 PR，支持 state/sort/page 筛选（精简输出） | `GET /repos/:owner/:repo/pulls` |
+| `gitcode_get_pull_request` | 获取单个 PR 详情（精简输出） | `GET /repos/:owner/:repo/pulls/:number` |
 | `gitcode_create_pull_request` | 创建新 PR，支持跨仓、草稿、Squash、审查人/测试人分配 | `POST /repos/:owner/:repo/pulls` |
+| `gitcode_update_pull_request` | 更新 PR 信息 | `PATCH /repos/:owner/:repo/pulls/:number` |
 | `gitcode_create_pull_request_comment` | 在 PR 上添加评论（支持普通评论和代码行评论） | `POST /repos/:owner/:repo/pulls/:number/comments` |
-| `gitcode_list_pull_request_comments` | 获取 PR 全部评论（预留 v1.1） | `GET /repos/:owner/:repo/pulls/:number/comments` |
+| `gitcode_list_pull_request_comments` | 获取 PR 全部评论（精简输出） | `GET /repos/:owner/:repo/pulls/:number/comments` |
 
-> **可扩展性预留：** PR 合并、关闭、审查操作（approve/request changes）作为 v1.1+ 候选。评论列表工具与 Issue 评论列表共享相同的设计模式，可快速实现。
+### 5.3 Issue 属性增强（e2e 提单工作流）
 
-### 5.3 预留扩展方向
+| 工具名 | 功能 | API 端点 |
+|---|---|---|
+| `gitcode_list_milestones` | 获取仓库所有里程碑（返回 `number` + `title`，精简输出） | `GET /repos/:owner/:repo/milestones` |
+| `gitcode_list_kanbans` | 获取企业/组织看板列表（返回 `id` + `name`，精简输出） | `GET /org/:owner/kanban/list` |
+| `gitcode_add_to_kanban` | 添加 Issue/PR 到看板（更新关联看板） | `POST /org/:owner/kanban/:kanban_id/add_item` |
+
+> **update_issue 企业版属性**：`issue_severity`（优先级，5 值白名单）、`issue_type`（类型，5 值白名单，传名称非 id）。两者不能与 `status` 同时设置，且改 `issue_type` 会清空 milestone。
+
+### 5.4 用户工具
+
+| 工具名 | 功能 | API 端点 |
+|---|---|---|
+| `gitcode_get_current_user` | 获取当前 token 对应的用户信息 | `GET /user` |
+
+### 5.5 预留扩展方向
 
 以下功能模块在设计上已预留空间，可在后续版本中按需启用：
 
@@ -171,6 +187,8 @@ GitcodePullRequest  — PR 实体（含 head/base branch, assignees, testers, me
 GitcodeUser         — 用户实体（id, login, name, avatar_url）
 GitcodeIssueComment — Issue 评论
 GitcodePullRequestComment — PR 评论（含 diff 位置和 reply 线程）
+GitcodeMilestone    — 里程碑实体（number, title 等，用于更新 issue 的 milestone）
+GitcodeKanban       — 看板实体（id, name，用于 add_to_kanban 的 kanban_id）
 ```
 
 ---
