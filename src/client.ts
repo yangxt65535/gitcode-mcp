@@ -26,6 +26,12 @@ import type {
   CreatePullRequestCommentResult,
   ListPullRequestCommentsParams,
   GitcodePullRequestComment,
+  GitcodeMilestoneDetail,
+  ListMilestonesParams,
+  GitcodeKanban,
+  ListKanbansParams,
+  AddKanbanItemParams,
+  AddKanbanItemResult,
 } from './types.js';
 
 export class GitcodeClient {
@@ -364,6 +370,51 @@ export class GitcodeClient {
     const response = await this.client.get(
       `/repos/${params.owner}/${params.repo}/pulls/${params.pull_number}/comments`,
       { params: this.withToken({ page: params.page, per_page: params.per_page, direction: params.direction, comment_type: params.comment_type }) }
+    );
+    return response.data;
+  }
+
+  // ==================== Issue 属性增强方法 ====================
+
+  /**
+   * 获取仓库所有里程碑
+   * API: GET /repos/:owner/:repo/milestones
+   */
+  async listMilestones(params: ListMilestonesParams): Promise<GitcodeMilestoneDetail[]> {
+    const response = await this.client.get(
+      `/repos/${params.owner}/${params.repo}/milestones`,
+      { params: this.withToken({ state: params.state, page: params.page, per_page: params.per_page }) }
+    );
+    return response.data;
+  }
+
+  /**
+   * 获取组织看板列表
+   * API: GET /org/:owner/kanban/list
+   */
+  async listKanbans(params: ListKanbansParams): Promise<GitcodeKanban[]> {
+    const response = await this.client.get(
+      `/org/${params.owner}/kanban/list`,
+      { params: this.withToken({ page: params.page, per_page: params.per_page }) }
+    );
+    return response.data;
+  }
+
+  /**
+   * 添加 Issue 或 Pull Request 到看板
+   * API: POST /org/:owner/kanban/:kanban_id/add_item
+   */
+  async addKanbanItem(params: AddKanbanItemParams): Promise<AddKanbanItemResult> {
+    const body: Record<string, unknown> = {
+      repo: params.repo,
+    };
+    if (params.issue_iids != null) body.issue_iids = params.issue_iids;
+    if (params.pr_iids != null) body.pr_iids = params.pr_iids;
+
+    const response = await this.client.post(
+      `/org/${params.owner}/kanban/${params.kanban_id}/add_item`,
+      body,
+      { params: this.withToken() }
     );
     return response.data;
   }

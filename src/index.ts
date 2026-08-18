@@ -17,6 +17,7 @@ import { GitcodeClient } from './client.js';
 import { registerIssueTools } from './tools/issues.js';
 import { registerPullRequestTools } from './tools/pullRequests.js';
 import { registerUserTools } from './tools/user.js';
+import { registerIssueAttributeTools } from './tools/issueAttributes.js';
 
 // Load environment variables from .env file if exists
 config();
@@ -52,6 +53,7 @@ const server = new McpServer({
 registerIssueTools(server, gitcodeClient);
 registerPullRequestTools(server, gitcodeClient);
 registerUserTools(server, gitcodeClient);
+registerIssueAttributeTools(server, gitcodeClient);
 
 // Add server info resource
 server.registerResource(
@@ -84,6 +86,9 @@ server.registerResource(
             'gitcode_create_pull_request_comment',
             'gitcode_list_pull_request_comments',
             'gitcode_get_current_user',
+            'gitcode_list_milestones',
+            'gitcode_list_kanbans',
+            'gitcode_add_to_kanban',
           ],
           resources: [
             { name: 'gitcode-server-info', uri: 'gitcode://server/info' },

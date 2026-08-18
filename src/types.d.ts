@@ -391,3 +391,64 @@ export interface CurrentUser {
   url?: string;
   type?: string;
 }
+
+// ==================== Issue 属性增强相关类型 ====================
+
+// 里程碑 (GET /repos/:owner/:repo/milestones)
+export interface GitcodeMilestoneDetail {
+  id: number;
+  number: number;
+  title: string;
+  state: string;
+  description?: string;
+  due_on?: string;
+  created_at?: string;
+  updated_at?: string;
+  closed_at?: string;
+  [key: string]: unknown;
+}
+
+export interface ListMilestonesParams {
+  owner: string;
+  repo: string;
+  state?: string;
+  page?: number;
+  per_page?: number;
+}
+
+// 看板 (GET /org/:owner/kanban/list)
+export interface GitcodeKanban {
+  id: number;
+  name?: string;
+  title?: string;
+  description?: string;
+  owner?: string;
+  created_at?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+}
+
+export interface ListKanbansParams {
+  owner: string;
+  page?: number;
+  per_page?: number;
+}
+
+// 添加 Issue/PR 到看板 (POST /org/:owner/kanban/:kanban_id/add_item)
+export interface AddKanbanItemParams {
+  owner: string;
+  kanban_id: number;
+  /** 仓库的 path 名称（不含 owner 前缀，如 openfuyao-powers） */
+  repo: string;
+  /** 仓库内 issue 的 iid（即 issue number）数组 */
+  issue_iids?: number[];
+  /** 仓库内 pull request 的 iid 数组 */
+  pr_iids?: number[];
+}
+
+export interface AddKanbanItemResult {
+  id?: number | string;
+  success?: boolean;
+  message?: string;
+  [key: string]: unknown;
+}

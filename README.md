@@ -24,6 +24,12 @@
 - `gitcode_update_pull_request` - 更新 Pull Request 信息
 - `gitcode_create_pull_request_comment` - 在 Pull Request 中添加评论
 - `gitcode_list_pull_request_comments` - 获取 Pull Request 的所有评论
+- `gitcode_get_current_user` - 获取当前 token 对应的用户信息
+
+### Issue 属性增强（e2e 提单工作流）
+- `gitcode_list_milestones` - 获取仓库所有里程碑（返回 `number` + `title`，number 用于更新 Issue 的 `milestone` 字段）
+- `gitcode_list_kanbans` - 获取企业/组织看板列表（返回 `id` + `name`，id 用于 `gitcode_add_to_kanban` 的 `kanban_id`）
+- `gitcode_add_to_kanban` - 添加 Issue/PR 到看板（更新 Issue 关联看板）。参数：`owner`、`kanban_id`、`repo`（仓库 path 名称）、`issue_iids`（Issue iid 数组）或 `pr_iids`（PR iid 数组）
 
 ## 安装
 
