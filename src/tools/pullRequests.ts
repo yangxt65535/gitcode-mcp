@@ -27,54 +27,19 @@ export function registerPullRequestTools(server: McpServer, client: GitcodeClien
         });
 
         const prDetails = {
-          id: pr.id,
           number: pr.number,
           title: pr.title,
           body: pr.body,
           state: pr.state,
           draft: pr.draft,
           mergeable: pr.mergeable,
-          user: {
-            login: pr.user.login,
-            name: pr.user.name,
-          },
-          head: {
-            ref: pr.head.ref,
-            sha: pr.head.sha,
-            label: pr.head.label,
-            repo: pr.head.repo?.full_name,
-          },
-          base: {
-            ref: pr.base.ref,
-            sha: pr.base.sha,
-            label: pr.base.label,
-            repo: pr.base.repo?.full_name,
-          },
-          assignees: pr.assignees?.map(a => ({
-            login: a.login,
-            name: a.name,
-            accept: a.accept,
-          })) || [],
-          testers: pr.testers?.map(t => ({
-            login: t.login,
-            name: t.name,
-            accept: t.accept,
-          })) || [],
-          approval_reviewers: pr.approval_reviewers?.map(r => ({
-            login: r.login,
-            name: r.name,
-            accept: r.accept,
-          })) || [],
-          labels: pr.labels?.map(l => ({ name: l.name, color: l.color })) || [],
+          user: pr.user.login,
+          head: pr.head.ref,
+          base: pr.base.ref,
+          labels: pr.labels?.map(l => l.name) || [],
           milestone: pr.milestone?.title,
-          merged: pr.merged_at ? true : false,
           merged_at: pr.merged_at,
-          merged_by: pr.merged_by?.login,
-          created_at: pr.created_at,
-          updated_at: pr.updated_at,
-          closed_at: pr.closed_at,
           url: pr.html_url,
-          can_merge_check: pr.can_merge_check,
         };
 
         return {
@@ -127,9 +92,6 @@ export function registerPullRequestTools(server: McpServer, client: GitcodeClien
           user: pr.user.login,
           head: pr.head.ref,
           base: pr.base.ref,
-          labels: pr.labels?.map(l => l.name) || [],
-          created_at: pr.created_at,
-          updated_at: pr.updated_at,
           url: pr.html_url,
         }));
 
@@ -363,28 +325,18 @@ export function registerPullRequestTools(server: McpServer, client: GitcodeClien
 
         const commentList = comments.map(c => ({
           id: c.id,
-          discussion_id: c.discussion_id,
           body: c.body,
           comment_type: c.comment_type,
           resolved: c.resolved,
+          user: c.user.login,
           diff_file: c.diff_file,
-          diff_position: c.diff_position,
-          user: {
-            login: c.user.login,
-            name: c.user.name,
-          },
           reply: c.reply?.map(r => ({
             id: r.id,
             body: r.body,
-            user: {
-              login: r.user.login,
-              name: r.user.name,
-            },
+            user: r.user.login,
             created_at: r.created_at,
-            updated_at: r.updated_at,
           })) || [],
           created_at: c.created_at,
-          updated_at: c.updated_at,
         }));
 
         return {

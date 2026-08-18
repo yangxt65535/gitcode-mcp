@@ -27,26 +27,15 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
         });
 
         const issueDetails = {
-          id: issue.id,
           number: issue.number,
           title: issue.title,
           body: issue.body,
           state: issue.state,
-          issue_state: issue.issue_state,
-          user: {
-            login: issue.user.login,
-            name: issue.user.name,
-          },
-          labels: issue.labels?.map(l => ({ name: l.name, color: l.color })) || [],
-          priority: issue.priority,
           issue_type: issue.issue_type,
-          comments: issue.comments,
+          priority: issue.priority,
           milestone: issue.milestone?.title,
-          created_at: issue.created_at,
-          updated_at: issue.updated_at,
-          finished_at: issue.finished_at,
+          comments: issue.comments,
           url: issue.html_url,
-          repository: issue.repository?.full_name,
         };
 
         return {
@@ -94,13 +83,9 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
           number: issue.number,
           title: issue.title,
           state: issue.state,
-          issue_state: issue.issue_state,
-          user: issue.user.login,
-          labels: issue.labels?.map(l => l.name) || [],
-          priority: issue.priority,
           issue_type: issue.issue_type,
-          comments: issue.comments,
-          created_at: issue.created_at,
+          priority: issue.priority,
+          milestone: issue.milestone?.title,
           url: issue.html_url,
         }));
 
@@ -342,13 +327,8 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
         const commentList = comments.map(c => ({
           id: c.id,
           body: c.body,
-          user: {
-            login: c.user.login,
-            name: c.user.name,
-          },
-          target: c.target,
+          user: c.user.login,
           created_at: c.created_at,
-          updated_at: c.updated_at,
         }));
 
         return {
