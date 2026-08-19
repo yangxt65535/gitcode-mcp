@@ -28,7 +28,7 @@
 
 ### Issue 属性增强（e2e 提单工作流）
 - `gitcode_list_milestones` - 获取仓库所有里程碑（返回 `number` + `title`，number 用于更新 Issue 的 `milestone` 字段）
-- `gitcode_list_kanbans` - 获取企业/组织看板列表（返回 `id` + `name`，id 用于 `gitcode_add_to_kanban` 的 `kanban_id`）
+- `gitcode_list_kanbans` - 获取企业/组织看板列表（返回 `id` + `name`；`id` 为字符串雪花 ID，用于 `gitcode_add_to_kanban` 的 `kanban_id`，不要转成 number）
 - `gitcode_add_to_kanban` - 添加 Issue/PR 到看板（更新 Issue 关联看板）。参数：`owner`、`kanban_id`、`repo`（仓库 path 名称）、`issue_iids`（Issue iid 数组）或 `pr_iids`（PR iid 数组）
 
 ### `gitcode_update_issue` 支持的企业版属性（本地白名单校验）
@@ -38,7 +38,7 @@
 | `issue_severity` | `无优先级` / `不重要` / `次要` / `主要` / `严重` | Issue 优先级（企业版） |
 | `issue_type` | `缺陷/Bug` / `任务/Task` / `需求/Requirement` / `测试用例/Test Cases` / `CVE和安全问题/CVE` | Issue 类型（企业版），传入名称字符串，非 id |
 
-> **约束**：`issue_type` 不能与 `issue_severity`（优先级）或 `status`（状态）**同时设置**，否则本地校验会直接报错，需分多次请求。
+> **约束**：更新 `issue_type` 时**不能同时更新任何其他字段**（含标题、正文、状态、优先级等），否则本地校验会直接报错，需分多次请求。
 >
 > **注意**：单独修改 `issue_type` 会**清空 issue 的 milestone**，改完类型后需重新设置 milestone。
 

@@ -419,7 +419,9 @@ export interface ListMilestonesParams {
 
 // 看板 (GET /org/:owner/kanban/list)
 export interface GitcodeKanban {
-  id: number;
+  /** Snowflake id; keep as string (exceeds JS Number.MAX_SAFE_INTEGER). */
+  id: string;
+  iid?: number;
   name?: string;
   title?: string;
   description?: string;
@@ -438,7 +440,7 @@ export interface ListKanbansParams {
 // 添加 Issue/PR 到看板 (POST /org/:owner/kanban/:kanban_id/add_item)
 export interface AddKanbanItemParams {
   owner: string;
-  kanban_id: number;
+  kanban_id: string;
   /** 仓库的 path 名称（不含 owner 前缀，如 openfuyao-powers） */
   repo: string;
   /** 仓库内 issue 的 iid（即 issue number）数组 */

@@ -189,7 +189,11 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
     issue_type: z
       .string()
       .optional()
-      .describe('issue类型（企业版支持），可选值：' + ISSUE_TYPES.join(' / '))
+      .describe(
+        'issue类型（企业版支持），可选值：' +
+          ISSUE_TYPES.join(' / ') +
+          '。单独更新：传 issue_type 时不得同时传 title/body/state 等其他可更新字段'
+      )
       .refine(
         (v) => v === undefined || isIssueType(v),
         { message: `issue类型必须是以下之一：${ISSUE_TYPES.join(', ')}` }
@@ -198,14 +202,25 @@ export function registerIssueTools(server: McpServer, client: GitcodeClient) {
   };
 
   const updateIssueInput = z.object(updateIssueInputShape).superRefine((val, ctx) => {
-    const hasType = val.issue_type !== undefined;
-    const hasSeverity = val.issue_severity !== undefined;
-    const hasStatus = val.status !== undefined;
-    if (hasType && (hasSeverity || hasStatus)) {
+    if (val.issue_type === undefined) return;
+    const otherUpdateKeys = [
+      'title',
+      'body',
+      'state',
+      'assignee',
+      'milestone',
+      'labels',
+      'security_hole',
+      'status',
+      'issue_severity',
+      'custom_fields',
+    ] as const;
+    const extras = otherUpdateKeys.filter((key) => val[key] !== undefined);
+    if (extras.length > 0) {
       ctx.addIssue({
         code: 'custom',
         path: ['issue_type'],
-        message: 'issue_type 不能与 issue_severity(优先级) 或 status(状态) 同时设置，请分多次请求',
+        message: `更新 issue_type 时不能同时更新其他字段（${extras.join(', ')}），请分多次请求`,
       });
     }
   });

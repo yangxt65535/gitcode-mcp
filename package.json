@@ -16,7 +16,7 @@
     "build": "npm run clean && tsc",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
-    "test": "tsx test/update-issue.ts",
+    "test": "tsx test/update-issue.ts && tsx test/list-kanbans.ts",
     "test:issue": "tsx test/issue-get.ts",
     "test:pr": "tsx test/pull-request-get.ts",
     "prepublishOnly": "npm run build"

@@ -12,7 +12,7 @@ MCP Server that wraps Gitcode REST API as standardized MCP Tools, enabling AI as
 npm run build          # Clean dist/ then compile TypeScript
 npm run start          # Start the MCP server (stdio transport)
 npm run dev            # Watch mode for development
-npm test               # gitcode_update_issue schema + issue_type forwarding regression
+npm test               # update_issue + list_kanbans regressions
 ```
 
 ## Architecture
@@ -33,7 +33,8 @@ src/tools/user.ts      Registers 1 user tool (get_current_user)
 - **PR normalization**: `POST /pulls` returns GitLab-style fields (`source_branch`, `target_branch`, `author`); `GET /pulls/:id` returns `head`/`base` objects. `normalizePullRequestResponse()` unifies both to `head.ref` / `base.ref`.
 - **Error handling**: Three layers — axios interceptor (wrap HTTP errors) → tool handler try/catch (return `isError: true`) → startup check (exit on missing `GITCODE_TOKEN`). The server never crashes on individual tool failures.
 - **Tool pattern**: Each tool uses `server.registerTool()` with Zod `inputSchema`, calls a client method, and returns a slimmed JSON response optimized for LLM context windows.
-- **update_issue 企业版属性**: `issue_severity`（优先级）与 `issue_type`（类型）有本地白名单校验；`issue_type` 不能与 `issue_severity`/`status` 同时设置（handler 内 `.superRefine()` 互斥校验）。`inputSchema` 必须用 Zod raw shape（与其它 tool 一致），不能把带 `.superRefine()` 的 ZodEffects 直接交给 SDK，否则 JSON Schema 会变成 `properties: {}`。改 `issue_type` 会清空 milestone。
+- **update_issue 企业版属性**: `issue_severity`（优先级）与 `issue_type`（类型）有本地白名单校验；传 `issue_type` 时不得同时传任何其他可更新字段（handler 内 `.superRefine()`）。`inputSchema` 必须用 Zod raw shape（与其它 tool 一致），不能把带 `.superRefine()` 的 ZodEffects 直接交给 SDK，否则 JSON Schema 会变成 `properties: {}`。改 `issue_type` 会清空 milestone。
+- **list_kanbans**: `GET /org/:owner/kanban/list` 返回 `{ content: [...] }` 包装对象，client 必须解包；看板 `id` 是雪花字符串，超过 JS 安全整数，`kanban_id` 用 string 不要转 number。里程碑 `GET /repos/:owner/:repo/milestones` 则是顶层数组，无此问题。
 - **Extension path**: New API domains → add file in `src/tools/` → implement `register*Tools()` → call it in `index.ts`. Add API methods to `client.ts` reusing existing `withToken()` and error interceptor.
 
 ## Environment

@@ -143,10 +143,10 @@ src/
 | 工具名 | 功能 | API 端点 |
 |---|---|---|
 | `gitcode_list_milestones` | 获取仓库所有里程碑（返回 `number` + `title`，精简输出） | `GET /repos/:owner/:repo/milestones` |
-| `gitcode_list_kanbans` | 获取企业/组织看板列表（返回 `id` + `name`，精简输出） | `GET /org/:owner/kanban/list` |
+| `gitcode_list_kanbans` | 获取企业/组织看板列表（解包 `content`，返回字符串 `id` + `name`） | `GET /org/:owner/kanban/list` |
 | `gitcode_add_to_kanban` | 添加 Issue/PR 到看板（更新关联看板） | `POST /org/:owner/kanban/:kanban_id/add_item` |
 
-> **update_issue 企业版属性**：`issue_severity`（优先级，5 值白名单）、`issue_type`（类型，5 值白名单，传名称非 id）。两者不能与 `status` 同时设置，且改 `issue_type` 会清空 milestone。
+> **update_issue 企业版属性**：`issue_severity`（优先级，5 值白名单）、`issue_type`（类型，5 值白名单，传名称非 id）。传 `issue_type` 时不得同时更新其他字段，且改 `issue_type` 会清空 milestone。
 
 ### 5.4 用户工具
 
@@ -188,7 +188,7 @@ GitcodeUser         — 用户实体（id, login, name, avatar_url）
 GitcodeIssueComment — Issue 评论
 GitcodePullRequestComment — PR 评论（含 diff 位置和 reply 线程）
 GitcodeMilestone    — 里程碑实体（number, title 等，用于更新 issue 的 milestone）
-GitcodeKanban       — 看板实体（id, name，用于 add_to_kanban 的 kanban_id）
+GitcodeKanban       — 看板实体（string id, name，id 用于 add_to_kanban 的 kanban_id）
 ```
 
 ---

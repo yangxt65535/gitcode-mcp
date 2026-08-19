@@ -2,7 +2,7 @@
  * Regression tests for gitcode_update_issue:
  * 1. MCP JSON schema must expose fields (not properties: {})
  * 2. handler must forward issue_type to GitcodeClient
- * 3. issue_type cannot be set together with issue_severity
+ * 3. issue_type cannot be set together with any other updatable field
  */
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -10,11 +10,11 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { GitcodeClient } from '../src/client.js';
 import { registerIssueTools } from '../src/tools/issues.js';
 
-let captured: Record<string, unknown> | undefined;
+const capture: { params?: Record<string, unknown> } = {};
 
 const mockClient = {
   updateIssue: async (params: Record<string, unknown>) => {
-    captured = params;
+    capture.params = params;
     return {
       id: 1,
       number: '20',
@@ -47,7 +47,6 @@ async function main() {
     assert(key in properties, `schema missing property "${key}"; got ${JSON.stringify(Object.keys(properties))}`);
   }
 
-  captured = undefined;
   const result = await mcpClient.callTool({
     name: 'gitcode_update_issue',
     arguments: {
@@ -58,12 +57,13 @@ async function main() {
     },
   });
   assert(!result.isError, `unexpected error: ${JSON.stringify(result)}`);
+  const forwarded = capture.params;
   assert(
-    captured?.issue_type === '需求/Requirement',
-    `issue_type not forwarded to client: ${JSON.stringify(captured)}`
+    forwarded !== undefined && forwarded.issue_type === '需求/Requirement',
+    `issue_type not forwarded to client: ${JSON.stringify(capture.params)}`
   );
 
-  const mutex = await mcpClient.callTool({
+  const mutexSeverity = await mcpClient.callTool({
     name: 'gitcode_update_issue',
     arguments: {
       owner: 'openFuyao',
@@ -73,7 +73,19 @@ async function main() {
       issue_severity: '主要',
     },
   });
-  assert(mutex.isError, 'expected mutual-exclusion validation error');
+  assert(mutexSeverity.isError, 'expected error when issue_type is combined with issue_severity');
+
+  const mutexTitle = await mcpClient.callTool({
+    name: 'gitcode_update_issue',
+    arguments: {
+      owner: 'openFuyao',
+      repo: 'openfuyao-powers',
+      issue_number: '20',
+      issue_type: '需求/Requirement',
+      title: 'should not be allowed',
+    },
+  });
+  assert(mutexTitle.isError, 'expected error when issue_type is combined with title');
 
   console.log('ALL TESTS PASSED');
   await mcpClient.close();

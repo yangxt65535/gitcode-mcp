@@ -398,7 +398,7 @@ export class GitcodeClient {
       `/org/${params.owner}/kanban/list`,
       { params: this.withToken({ page: params.page, per_page: params.per_page }) }
     );
-    return response.data;
+    return unwrapKanbanList(response.data);
   }
 
   /**
@@ -419,4 +419,15 @@ export class GitcodeClient {
     );
     return response.data;
   }
+}
+
+/** GitCode returns { content: GitcodeKanban[] }, not a raw array. */
+function unwrapKanbanList(data: unknown): GitcodeKanban[] {
+  if (Array.isArray(data)) {
+    return data as GitcodeKanban[];
+  }
+  if (data && typeof data === 'object' && Array.isArray((data as { content?: unknown }).content)) {
+    return (data as { content: GitcodeKanban[] }).content;
+  }
+  throw new Error(`Unexpected kanban list response: ${JSON.stringify(data)}`);
 }

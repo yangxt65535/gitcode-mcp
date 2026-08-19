@@ -76,7 +76,7 @@ export function registerIssueAttributeTools(server: McpServer, client: GitcodeCl
         });
 
         const kanbanList = (Array.isArray(kanbans) ? kanbans : []).map((k) => ({
-          id: k.id,
+          id: String(k.id),
           name: k.name,
         }));
 
@@ -105,7 +105,7 @@ export function registerIssueAttributeTools(server: McpServer, client: GitcodeCl
       description: '将 Issue 或 Pull Request 添加到组织看板（更新 Issue 关联看板）。repo 为仓库 path 名称，issue_iids/pr_iids 为仓库内 issue/PR 的 iid 数组',
       inputSchema: {
         owner: z.string().describe('组织/企业空间地址(path)'),
-        kanban_id: z.number().describe('看板 ID（来自 gitcode_list_kanbans 的 id）'),
+        kanban_id: z.string().describe('看板 ID（来自 gitcode_list_kanbans 的 id 字符串；雪花 ID，禁止转成 number，会丢失精度）'),
         repo: z.string().describe('仓库的 path 名称（不含 owner 前缀，如 openfuyao-powers）'),
         issue_iids: z.array(z.number()).optional().describe('要添加的 Issue iid（issue number）数组，与 pr_iids 至少提供一个'),
         pr_iids: z.array(z.number()).optional().describe('要添加的 Pull Request iid 数组，与 issue_iids 至少提供一个'),
