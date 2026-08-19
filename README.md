@@ -12,12 +12,18 @@
 仓库：[https://github.com/yangxt65535/gitcode-mcp](https://github.com/yangxt65535/gitcode-mcp)
 
 ## 工具列表
+
+### Issue 操作
+
 - `gitcode_list_issues` - 列出仓库的 Issues
 - `gitcode_get_issue` - 获取单个 Issue 详情
 - `gitcode_create_issue` - 创建新 Issue
 - `gitcode_update_issue` - 更新 Issue 信息
 - `gitcode_create_issue_comment` - 在 Issue 中添加评论
 - `gitcode_list_issue_comments` - 获取 Issue 的所有评论
+
+### Pull Request 操作
+
 - `gitcode_list_pull_requests` - 列出仓库的 Pull Requests
 - `gitcode_get_pull_request` - 获取单个 Pull Request 详情
 - `gitcode_create_pull_request` - 创建新 Pull Request
@@ -26,24 +32,15 @@
 - `gitcode_list_pull_request_comments` - 获取 Pull Request 的所有评论
 - `gitcode_get_current_user` - 获取当前 token 对应的用户信息
 
-### Issue 属性增强（e2e 提单工作流）
+### 组织/企业功能
+
 - `gitcode_list_milestones` - 获取仓库所有里程碑（返回 `number` + `title`，number 用于更新 Issue 的 `milestone` 字段）
 - `gitcode_list_kanbans` - 获取企业/组织看板列表（返回 `id` + `name`；`id` 为字符串雪花 ID，用于 `gitcode_add_to_kanban` 的 `kanban_id`，不要转成 number）
 - `gitcode_add_to_kanban` - 添加 Issue/PR 到看板（更新 Issue 关联看板）。参数：`owner`、`kanban_id`、`repo`（仓库 path 名称）、`issue_iids`（Issue iid 数组）或 `pr_iids`（PR iid 数组）
 
-### `gitcode_update_issue` 支持的企业版属性（本地白名单校验）
+### 用户信息
 
-| 参数 | 可选值 | 说明 |
-|---|---|---|
-| `issue_severity` | `无优先级` / `不重要` / `次要` / `主要` / `严重` | Issue 优先级（企业版） |
-| `issue_type` | `缺陷/Bug` / `任务/Task` / `需求/Requirement` / `测试用例/Test Cases` / `CVE和安全问题/CVE` | Issue 类型（企业版），传入名称字符串，非 id |
-
-> **约束**：更新 `issue_type` 时**不能同时更新任何其他字段**（含标题、正文、状态、优先级等），否则本地校验会直接报错，需分多次请求。
->
-> **注意**：单独修改 `issue_type` 会**清空 issue 的 milestone**，改完类型后需重新设置 milestone。
-
-### 输出精简
-Issue / PR 的 list、get、评论列举接口均做了**输出精简**，仅返回核心字段（如 number、title、state、type、priority、milestone、url 等），去除冗余/低频字段（user.name、labels 颜色、时间戳、reviewer 等），以降低 LLM 上下文占用。
+- `gitcode_get_current_user` - 获取当前 token 对应的用户信息
 
 ## 安装
 
@@ -108,19 +105,19 @@ GET /repos/:owner/:repo/issues/:number?access_token=YOUR_TOKEN
 
 本包默认公开发布到 npm（`@yangxt65535/gitcode-mcp`）。推送符合 `v*` 的 git tag 后，GitHub Actions 会通过 npm Trusted Publishing（OIDC）自动执行 `npm publish`。
 
-本地发版示例：
-
-```bash
-npm version patch   # 或 minor / major
-git push origin master --follow-tags
-```
-
-首次启用前，请在 [npmjs](https://www.npmjs.com/) 包设置中添加 Trusted Publisher：
-
-- Publisher: GitHub Actions
-- Repository: `yangxt65535/gitcode-mcp`
-- Workflow: `publish.yml`
-
 ## 注意事项
 
+### 文档参考
+
 API 端点和认证方式可能需要根据 Gitcode 实际 API 文档进行调整。请参考：[https://docs.gitcode.com/docs/apis/](https://docs.gitcode.com/docs/apis/)
+
+### 硬编码字段
+
+| 参数 | 可选值 | 说明 |
+|---|---|---|
+| `issue_severity` | `无优先级` / `不重要` / `次要` / `主要` / `严重` | Issue 优先级（企业版） |
+| `issue_type` | `缺陷/Bug` / `任务/Task` / `需求/Requirement` / `测试用例/Test Cases` / `CVE和安全问题/CVE` | Issue 类型（企业版），传入名称字符串，非 id |
+
+### 输出精简
+
+Issue / PR 的 list、get、评论列举接口均做了**输出精简**，仅返回核心字段（如 number、title、state、type、priority、milestone、url 等），去除冗余/低频字段（user.name、labels 颜色、时间戳、reviewer 等），以降低 LLM 上下文占用。
