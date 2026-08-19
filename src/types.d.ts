@@ -363,6 +363,7 @@ export interface UpdateIssueParams {
   security_hole?: string;
   status?: string;
   issue_severity?: string;
+  issue_type?: string;
   custom_fields?: Record<string, unknown>[];
 }
 

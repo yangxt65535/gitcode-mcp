@@ -219,6 +219,7 @@ export class GitcodeClient {
     if (params.security_hole) body.security_hole = params.security_hole;
     if (params.status) body.status = params.status;
     if (params.issue_severity) body.issue_severity = params.issue_severity;
+    if (params.issue_type) body.issue_type = params.issue_type;
     if (params.custom_fields) body.custom_fields = params.custom_fields;
 
     const response = await this.client.patch(
