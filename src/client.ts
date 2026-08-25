@@ -32,6 +32,9 @@ import type {
   ListKanbansParams,
   AddKanbanItemParams,
   AddKanbanItemResult,
+  GitcodeRepositoryDetail,
+  GetRepoParams,
+  ListForksParams,
 } from './types.js';
 
 export class GitcodeClient {
@@ -419,6 +422,38 @@ export class GitcodeClient {
     );
     return response.data;
   }
+
+  // ==================== Repository 查询 ====================
+
+  /**
+   * Get a single repository
+   * API: GET /repos/:owner/:repo
+   */
+  async getRepo(params: GetRepoParams): Promise<GitcodeRepositoryDetail> {
+    const response = await this.client.get(
+      `/repos/${params.owner}/${params.repo}`,
+      { params: this.withToken() }
+    );
+    return response.data;
+  }
+
+  /**
+   * List forks of a repository
+   * API: GET /repos/:owner/:repo/forks
+   */
+  async listForks(params: ListForksParams): Promise<GitcodeRepositoryDetail[]> {
+    const response = await this.client.get(
+      `/repos/${params.owner}/${params.repo}/forks`,
+      {
+        params: this.withToken({
+          sort: params.sort,
+          page: params.page,
+          per_page: params.per_page,
+        }),
+      }
+    );
+    return unwrapForkList(response.data);
+  }
 }
 
 /** GitCode returns { content: GitcodeKanban[] }, not a raw array. */
@@ -430,4 +465,15 @@ function unwrapKanbanList(data: unknown): GitcodeKanban[] {
     return (data as { content: GitcodeKanban[] }).content;
   }
   throw new Error(`Unexpected kanban list response: ${JSON.stringify(data)}`);
+}
+
+/** Forks are documented as a top-level array; unwrap { content: [...] } if wrapped. */
+function unwrapForkList(data: unknown): GitcodeRepositoryDetail[] {
+  if (Array.isArray(data)) {
+    return data as GitcodeRepositoryDetail[];
+  }
+  if (data && typeof data === 'object' && Array.isArray((data as { content?: unknown }).content)) {
+    return (data as { content: GitcodeRepositoryDetail[] }).content;
+  }
+  throw new Error(`Unexpected fork list response: ${JSON.stringify(data)}`);
 }

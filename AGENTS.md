@@ -12,7 +12,7 @@ MCP Server that wraps Gitcode REST API as standardized MCP Tools, enabling AI as
 npm run build          # Clean dist/ then compile TypeScript
 npm run start          # Start the MCP server (stdio transport)
 npm run dev            # Watch mode for development
-npm test               # update_issue + list_kanbans regressions
+npm test               # update_issue + list_kanbans + repos regressions
 ```
 
 ## Architecture
@@ -20,10 +20,11 @@ npm test               # update_issue + list_kanbans regressions
 ```
 src/index.ts           Entry point: loads env, creates GitcodeClient + McpServer, registers all tools, starts stdio transport
 src/client.ts          GitcodeClient: axios wrapper with token-as-query-param auth, error interceptor, PR response normalization
-src/types.d.ts         TypeScript interfaces for Gitcode API entities (Issue, PR, Milestone, Kanban, Comment, params)
+src/types.d.ts         TypeScript interfaces for Gitcode API entities (Issue, PR, Milestone, Kanban, Comment, Repo, params)
 src/tools/issues.ts    Registers 6 Issue tools (list, get, create, update, create_comment, list_comments)
 src/tools/pullRequests.ts   Registers 6 PR tools (list, get, create, update, create_comment, list_comments)
 src/tools/issueAttributes.ts  Registers 3 Issue-attribute tools (list_milestones, list_kanbans, add_to_kanban)
+src/tools/repositories.ts     Registers 2 Repository tools (get_repo, list_forks)
 src/tools/user.ts      Registers 1 user tool (get_current_user)
 ```
 
@@ -35,6 +36,7 @@ src/tools/user.ts      Registers 1 user tool (get_current_user)
 - **Tool pattern**: Each tool uses `server.registerTool()` with Zod `inputSchema`, calls a client method, and returns a slimmed JSON response optimized for LLM context windows.
 - **update_issue 企业版属性**: `issue_severity`（优先级）与 `issue_type`（类型）有本地白名单校验；传 `issue_type` 时不得同时传任何其他可更新字段（handler 内 `.superRefine()`）。`inputSchema` 必须用 Zod raw shape（与其它 tool 一致），不能把带 `.superRefine()` 的 ZodEffects 直接交给 SDK，否则 JSON Schema 会变成 `properties: {}`。改 `issue_type` 会清空 milestone。
 - **list_kanbans**: `GET /org/:owner/kanban/list` 返回 `{ content: [...] }` 包装对象，client 必须解包；看板 `id` 是雪花字符串，超过 JS 安全整数，`kanban_id` 用 string 不要转 number。里程碑 `GET /repos/:owner/:repo/milestones` 则是顶层数组，无此问题。
+- **get_repo / list_forks**: `GET /repos/:owner/:repo` 与 `GET /repos/:owner/:repo/forks` 用于识别组织仓 vs fork。工具输出精简为 `full_name`、`fork`/`parent`、clone URL、`namespace`、`permission` 等远端判断字段；`list_forks` 若返回 `{ content: [...] }` 需解包。
 - **Extension path**: New API domains → add file in `src/tools/` → implement `register*Tools()` → call it in `index.ts`. Add API methods to `client.ts` reusing existing `withToken()` and error interceptor.
 
 ## Environment

@@ -26,6 +26,10 @@
 - `gitcode_list_pull_request_comments` - 获取 Pull Request 的所有评论
 - `gitcode_get_current_user` - 获取当前 token 对应的用户信息
 
+### 仓库查询（远端识别）
+- `gitcode_get_repo` - 获取仓库详情（精简输出：`full_name`、`fork`/`parent`、clone URL、`namespace`、`permission`）
+- `gitcode_list_forks` - 列出仓库已有的 Fork（精简输出：`full_name`、`owner`、`parent`、clone URL）
+
 ### Issue 属性增强（e2e 提单工作流）
 - `gitcode_list_milestones` - 获取仓库所有里程碑（返回 `number` + `title`，number 用于更新 Issue 的 `milestone` 字段）
 - `gitcode_list_kanbans` - 获取企业/组织看板列表（返回 `id` + `name`；`id` 为字符串雪花 ID，用于 `gitcode_add_to_kanban` 的 `kanban_id`，不要转成 number）
