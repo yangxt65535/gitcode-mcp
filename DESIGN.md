@@ -51,6 +51,7 @@ src/
     ├── issues.ts         ← Issue 相关 Tool 注册（含 update_issue 类型/优先级白名单校验）
     ├── pullRequests.ts   ← Pull Request 相关 Tool 注册
     ├── issueAttributes.ts← Issue 属性增强 Tool 注册（里程碑/看板）
+    ├── repositories.ts   ← 仓库查询 Tool 注册（get_repo / list_forks）
     └── user.ts           ← 用户相关 Tool 注册
 ```
 
@@ -154,13 +155,20 @@ src/
 |---|---|---|
 | `gitcode_get_current_user` | 获取当前 token 对应的用户信息 | `GET /user` |
 
-### 5.5 预留扩展方向
+### 5.5 仓库查询（远端识别）
+
+| 工具名 | 功能 | API 端点 |
+|---|---|---|
+| `gitcode_get_repo` | 获取仓库详情（精简：`full_name`、`fork`/`parent`、clone URL、`namespace`、`permission`） | `GET /repos/:owner/:repo` |
+| `gitcode_list_forks` | 列出仓库 Fork（精简：`full_name`、`owner`、`parent`、clone URL；`content` 包装需解包） | `GET /repos/:owner/:repo/forks` |
+
+### 5.6 预留扩展方向
 
 以下功能模块在设计上已预留空间，可在后续版本中按需启用：
 
 | 模块 | 描述 | 优先级 |
 |---|---|---|
-| Repository 管理 | 查询仓库信息、搜索仓库、列出组织仓库 | P2 |
+| Repository 管理 | 搜索仓库、列出组织仓库、创建 fork | P2 |
 | Branch 操作 | 列出分支、获取分支详情、创建/删除分支 | P2 |
 | Webhook 管理 | CRUD Webhook 配置 | P3 |
 | 文件内容 | 读取文件内容、获取目录树 | P3 |
@@ -189,6 +197,7 @@ GitcodeIssueComment — Issue 评论
 GitcodePullRequestComment — PR 评论（含 diff 位置和 reply 线程）
 GitcodeMilestone    — 里程碑实体（number, title 等，用于更新 issue 的 milestone）
 GitcodeKanban       — 看板实体（string id, name，id 用于 add_to_kanban 的 kanban_id）
+GitcodeRepositoryDetail — 仓库详情（full_name, fork, parent, permission, clone URL）
 ```
 
 ---

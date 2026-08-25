@@ -18,6 +18,7 @@ import { registerIssueTools } from './tools/issues.js';
 import { registerPullRequestTools } from './tools/pullRequests.js';
 import { registerUserTools } from './tools/user.js';
 import { registerIssueAttributeTools } from './tools/issueAttributes.js';
+import { registerRepositoryTools } from './tools/repositories.js';
 
 // Load environment variables from .env file if exists
 config();
@@ -54,6 +55,7 @@ registerIssueTools(server, gitcodeClient);
 registerPullRequestTools(server, gitcodeClient);
 registerUserTools(server, gitcodeClient);
 registerIssueAttributeTools(server, gitcodeClient);
+registerRepositoryTools(server, gitcodeClient);
 
 // Add server info resource
 server.registerResource(
@@ -89,6 +91,8 @@ server.registerResource(
             'gitcode_list_milestones',
             'gitcode_list_kanbans',
             'gitcode_add_to_kanban',
+            'gitcode_get_repo',
+            'gitcode_list_forks',
           ],
           resources: [
             { name: 'gitcode-server-info', uri: 'gitcode://server/info' },

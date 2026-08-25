@@ -455,3 +455,65 @@ export interface AddKanbanItemResult {
   message?: string;
   [key: string]: unknown;
 }
+
+// ==================== Repository 查询 ====================
+
+export interface GitcodeRepoNamespace {
+  id?: number;
+  type?: string;
+  name?: string;
+  path?: string;
+  html_url?: string;
+  [key: string]: unknown;
+}
+
+export interface GitcodeRepoPermission {
+  pull?: boolean;
+  push?: boolean;
+  admin?: boolean;
+}
+
+export interface GitcodeRepoParent {
+  id?: number;
+  full_name?: string;
+  human_name?: string;
+  url?: string;
+  namespace?: GitcodeRepoNamespace;
+  [key: string]: unknown;
+}
+
+/** GET /repos/:owner/:repo and GET /repos/:owner/:repo/forks item */
+export interface GitcodeRepositoryDetail {
+  id?: number;
+  full_name: string;
+  human_name?: string;
+  url?: string;
+  path?: string;
+  name?: string;
+  description?: string;
+  ssh_url_to_repo?: string;
+  http_url_to_repo?: string;
+  web_url?: string;
+  default_branch?: string;
+  fork?: boolean;
+  private?: boolean;
+  public?: boolean;
+  owner?: GitcodeUser;
+  namespace?: GitcodeRepoNamespace;
+  parent?: GitcodeRepoParent | null;
+  permission?: GitcodeRepoPermission;
+  [key: string]: unknown;
+}
+
+export interface GetRepoParams {
+  owner: string;
+  repo: string;
+}
+
+export interface ListForksParams {
+  owner: string;
+  repo: string;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
